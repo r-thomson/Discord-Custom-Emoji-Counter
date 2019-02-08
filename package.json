@@ -1,0 +1,14 @@
+{
+  "name": "discord-emoji-audit",
+  "version": "0.1.0",
+  "description": "A Discord bot that will tell how often server emoji are used.",
+  "repository": "https://github.com/r-thomson/Discord-Emoji-Audit-Bot",
+  "author": "Ryan Thomson",
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "start": "node ./index"
+  },
+  "dependencies": {
+    "discord.js": "^11.4.2"
+  }
+}
