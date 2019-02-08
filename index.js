@@ -85,6 +85,10 @@ client.on('message', message => {
 	});
 });
 
+client.on('error', err => {
+	console.log(err.message);
+});
+
 process.on('SIGINT', handleShutDown);
 
 function handleShutDown() {
