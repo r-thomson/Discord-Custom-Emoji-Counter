@@ -80,7 +80,8 @@ client.on('message', message => {
 		const auditTime = Number(process.hrtime.bigint() - auditStartTime);
 		console.log(`Finished audit in ${(auditTime/1000000000).toFixed(3)} seconds`);
 		
-		message.channel.send(output.join('\n'));
+		message.channel.send(output.join('\n'), {split: true})
+			.catch(err => console.log(err.message));
 		activatedMessage.then(msg => msg.delete()); // to do: handle permissions
 	});
 });
