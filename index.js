@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
-const { token, messageLimit } = require('./config.json');
+const { token } = require('./config.json');
+const countEmojis = require('./countEmojis');
 
 const client = new Discord.Client();
 client.login(token);
@@ -29,61 +30,24 @@ client.on('message', message => {
 	let activatedMessage = message.channel.send('Server Emoji audit in progress...');
 	const auditStartTime = process.hrtime.bigint();
 	
-	// Get all of the text channels on the server
-	let channels = message.guild.channels.filter(channel => channel.type === 'text');
-	
-	// Handle channels without view permissions
-	let blockedChannels = channels.filter(channel => !channel.permissionsFor(client.user).has('VIEW_CHANNEL'));
-	channels = channels.filter(channel => channel.permissionsFor(client.user).has('VIEW_CHANNEL'));
-	
-	let emojiCounts = message.guild.emojis;
-	emojiCounts.forEach(emoji => emoji.usageCount = 0);
-	
-	const ignoreRepeats = args.includes('norepeats');
-	
-	Promise.all(channels.map(channel => {
-		let messagesRetreived = 0;
-		
-		return recursiveEmojiCount();
-		
-		function recursiveEmojiCount(messagesBefore) {
-			return channel.fetchMessages({limit: 100, before: messagesBefore})
-				.then(messages => {
-					messagesRetreived += messages.size;
-					
-					messages.forEach(message => {
-						// Ignore messages sent by this bot
-						if (message.author.id === client.user.id) return;
-						
-						emojiCounts.forEach(emoji => {
-							const regex = new RegExp(emoji.toString(), 'gi');
-							const count = (message.content.match(regex) || []).length;
-							emoji.usageCount += ignoreRepeats ? count > 0 : count;
-						});
-					});
-					
-					if (messages.size < 100 || messagesRetreived >= messageLimit) {
-						console.log(`Finished scanning ${messagesRetreived} messages in ${channel.name}.`);
-					} else {
-						const lastMessage = messages.array().pop();
-						return recursiveEmojiCount(lastMessage.id);
-					}
-				});
-		}
-	})).then(() => {
-		let output = emojiCounts.map(emoji => {
-			return `${emoji.toString()} \`:${emoji.name}:\` ${emoji.usageCount} uses`;
+	countEmojis(client, message.guild, {
+		ignoreRepeats: args.includes('norepeats')
+	})
+		.then(results => {
+			let output = results.counts.map((count, emojiID) => {
+				let emoji = message.guild.emojis.get(emojiID);
+				return `${emoji.toString()} \`:${emoji.name}:\` ${count} uses`;
+			});
+			
+			output.push(`\n_${results.channelsAudited} channel(s) audited. ${results.channelsBlocked > 0 ? `Insufficient permissions for ${results.channelsBlocked} other(s).` : ''}_`);
+			
+			const auditTime = Number(process.hrtime.bigint() - auditStartTime);
+			console.log(`Finished audit in ${(auditTime/1000000000).toFixed(3)} seconds`);
+			
+			message.channel.send(output.join('\n'), {split: true})
+				.catch(err => console.log(err.message));
+			activatedMessage.then(msg => msg.delete()); // to do: handle permissions
 		});
-		
-		output.push(`\n_${channels.size} channel(s) audited. ${blockedChannels.size > 0 ? `Insufficient permissions for ${blockedChannels.size} other(s).` : ''}_`);
-		
-		const auditTime = Number(process.hrtime.bigint() - auditStartTime);
-		console.log(`Finished audit in ${(auditTime/1000000000).toFixed(3)} seconds`);
-		
-		message.channel.send(output.join('\n'), {split: true})
-			.catch(err => console.log(err.message));
-		activatedMessage.then(msg => msg.delete()); // to do: handle permissions
-	});
 });
 
 client.on('error', err => {
