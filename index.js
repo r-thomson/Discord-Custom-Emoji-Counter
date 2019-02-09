@@ -56,7 +56,7 @@ client.on('message', message => {
 						if (message.author.id === client.user.id) return;
 						
 						emojiCounts.forEach(emoji => {
-							const regex = new RegExp(`<:${emoji.name}:${emoji.id}>`, 'g');
+							const regex = new RegExp(emoji.toString(), 'gi');
 							const count = (message.content.match(regex) || []).length;
 							emoji.usageCount += ignoreRepeats ? count > 0 : count;
 						});
