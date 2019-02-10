@@ -34,15 +34,18 @@ client.on('message', message => {
 		ignoreRepeats: args.includes('norepeats')
 	})
 		.then(results => {
+			// Calculate the time taken by the operation (converted to seconds)
+			const auditTime = Number(process.hrtime.bigint() - auditStartTime) / 1000000000;
+			console.log(`Finished audit in ${auditTime.toFixed(3)} seconds`);
+			
 			let output = results.counts.map((count, emojiID) => {
 				let emoji = message.guild.emojis.get(emojiID);
 				return `${emoji.toString()} \`:${emoji.name}:\` ${count} uses`;
 			});
 			
-			output.push(`\n_${results.channelsAudited} channel(s) audited. ${results.channelsBlocked > 0 ? `Insufficient permissions for ${results.channelsBlocked} other(s).` : ''}_`);
-			
-			const auditTime = Number(process.hrtime.bigint() - auditStartTime);
-			console.log(`Finished audit in ${(auditTime/1000000000).toFixed(3)} seconds`);
+			let summaryMessage = `${results.channelsAudited} channel(s) audited in ${auditTime.toFixed(0)} seconds.`;
+			if (results.channelsBlocked > 0) summaryMessage += ` Insufficient permissions for ${results.channelsBlocked} other(s).`;
+			output.push(`\n_${summaryMessage}_`);
 			
 			message.channel.send(output.join('\n'), {split: true})
 				.catch(err => console.log(err.message));
