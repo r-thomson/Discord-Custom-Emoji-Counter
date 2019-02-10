@@ -22,31 +22,29 @@ module.exports = function(client, guild, options) {
 		
 		return recursiveEmojiCount();
 		
-		function recursiveEmojiCount(messagesBefore) {
-			return channel.fetchMessages({limit: 100, before: messagesBefore})
-				.then(messages => {
-					messagesRetreived += messages.size;
-					
-					messages.forEach(message => {
-						// Ignore messages sent by this bot
-						if (message.author.id === client.user.id) return;
-						
-						emojiCounts.forEach((value, key) => {
-							let emoji = guild.emojis.get(key);
-							const regex = new RegExp(emoji.toString(), 'gi');
-							const count = (message.content.match(regex) || []).length;
-							value += options.ignoreRepeats ? count > 0 : count;
-							emojiCounts.set(key, value);
-						}, emojiCounts);
-					});
-					
-					if (messages.size < 100 || messagesRetreived >= messageLimit) {
-						console.log(`Finished scanning ${messagesRetreived} messages in '#${channel.name}'.`);
-					} else {
-						const lastMessage = messages.array().pop();
-						return recursiveEmojiCount(lastMessage.id);
-					}
+		async function recursiveEmojiCount(messagesBefore) {
+			let messages = await channel.fetchMessages({limit: 100, before: messagesBefore});
+			messagesRetreived += messages.size;
+			
+			messages.forEach(message => {
+				// Ignore messages sent by this bot
+				if (message.author.id === client.user.id) return;
+				
+				emojiCounts.forEach((value, key) => {
+					let emoji = guild.emojis.get(key);
+					const regex = new RegExp(emoji.toString(), 'gi');
+					const count = (message.content.match(regex) || []).length;
+					value += options.ignoreRepeats ? count > 0 : count;
+					emojiCounts.set(key, value);
 				});
+			});
+			
+			if (messages.size < 100 || messagesRetreived >= messageLimit) {
+				console.log(`Finished scanning ${messagesRetreived} messages in '#${channel.name}'.`);
+			} else {
+				const lastMessage = messages.array().pop();
+				return recursiveEmojiCount(lastMessage.id);
+			}
 		}
 	})).then(() => ({
 		channelsAudited: channels.size,
