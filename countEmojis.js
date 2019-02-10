@@ -40,7 +40,7 @@ module.exports = function(client, guild, options) {
 			});
 			
 			if (messages.size < 100 || messagesRetreived >= messageLimit) {
-				console.log(`Finished scanning ${messagesRetreived} messages in '#${channel.name}'.`);
+				console.log(`Finished scanning ${messagesRetreived} messages in "#${channel.name}".`);
 			} else {
 				const lastMessage = messages.array().pop();
 				return recursiveEmojiCount(lastMessage.id);
