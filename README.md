@@ -4,13 +4,16 @@ A bot for [Discord](https://discordapp.com) that counts the usage of custom emoj
 
 1. Clone the project and install dependencies  with `npm install`
 2. Create a `config.json` file in the project directory. The format for this file is as follows.
+
 ```
 {
     "token": "your bot token",
     "messageLimit": 5000
 }
 ```
+
 The environment variable `TOKEN` will be used if the token is not specified in `config.json`
+
 3. Start the bot with `npm start`
 
 ## Usage
