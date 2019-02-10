@@ -1,9 +1,19 @@
 const Discord = require('discord.js');
-const { token } = require('./config.json');
 const countEmojis = require('./countEmojis');
 
+// Get the login token
+const token = require('./config.json').token || process.env.TOKEN;
+if (!token) {
+	console.error('No token was provided.');
+	process.exit(1);
+}
+
 const client = new Discord.Client();
-client.login(token);
+client.login(token)
+	.catch(err => {
+		console.error(err.message);
+		process.exit(1);
+	});
 
 client.on('ready', () => {
 	console.log('Bot is now ready...\n');

@@ -10,6 +10,7 @@ A bot for [Discord](https://discordapp.com) that counts the usage of custom emoj
     "messageLimit": 5000
 }
 ```
+The environment variable `TOKEN` will be used if the token is not specified in `config.json`
 3. Start the bot with `npm start`
 
 ## Usage
