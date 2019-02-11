@@ -18,6 +18,9 @@ The environment variable `TOKEN` will be used if the token is not specified in `
 
 ## Usage
 
-To invoke the bot on a server, just @mention the bot while it is running. 
+To invoke the bot on a server, just @mention the bot while it is running. Optionally, you can append the following flags, separated by spaces.
+
+* `norepeats` Only count one of each type of emoji per message
+* `sorted` Sort the output from most to least used
 
 The bot can only scan for messages on channels that it has permission to read.

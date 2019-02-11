@@ -7,7 +7,7 @@ const { messageLimit } = require('./config.json');
  * @param guild The guild object for the server that the count will be performed on
  * @param options An object containing options
  */
-module.exports = function(client, guild, options) {
+module.exports = async function(client, guild, options) {
 	// Get all of the text channels on the server
 	let channels = guild.channels.filter(channel => channel.type === 'text');
 	
@@ -17,7 +17,7 @@ module.exports = function(client, guild, options) {
 	
 	let emojiCounts = new Discord.Collection(Array.from(guild.emojis, ([key]) => [key, 0]));
 	
-	return Promise.all(channels.map(channel => {
+	await Promise.all(channels.map(channel => {
 		let messagesRetreived = 0;
 		
 		return recursiveEmojiCount();
@@ -46,9 +46,23 @@ module.exports = function(client, guild, options) {
 				return recursiveEmojiCount(lastMessage.id);
 			}
 		}
-	})).then(() => ({
+	}));
+	
+	if (options.sortResults === 'uses') {
+		emojiCounts = emojiCounts.sort((usesA, usesB, emojiA, emojiB) => {
+			emojiA = guild.emojis.get(emojiA);
+			emojiB = guild.emojis.get(emojiB);
+			
+			if (usesA !== usesB) {
+				return usesB - usesA;
+			}
+			return emojiA.name.localeCompare(emojiB.name);
+		});
+	}
+	
+	return {
 		channelsAudited: channels.size,
 		channelsBlocked: blockedChannels.size,
 		counts: emojiCounts
-	}));
+	};
 };

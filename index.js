@@ -33,7 +33,7 @@ client.on('message', message => {
 	if (!message.content.startsWith(botMention)) return;
 	
 	// Argument parsing
-	const args = message.content.slice(botMention.length).trim().split(/ +/);
+	const args = message.content.slice(botMention.length).trim().toLowerCase().split(/ +/);
 	
 	console.log(`Invoked by ${message.author} on server "${message.guild.name}"`);
 	
@@ -41,7 +41,8 @@ client.on('message', message => {
 	const auditStartTime = process.hrtime.bigint();
 	
 	countEmojis(client, message.guild, {
-		ignoreRepeats: args.includes('norepeats')
+		ignoreRepeats: args.includes('norepeats'),
+		sortResults: args.includes('sorted') ? 'uses' : undefined
 	})
 		.then(results => {
 			// Calculate the time taken by the operation (converted to seconds)
