@@ -42,6 +42,7 @@ client.on('message', message => {
 	
 	countEmojis(client, message.guild, {
 		ignoreRepeats: args.includes('norepeats'),
+		countReactions: args.includes('reactions'),
 		sortResults: args.includes('sorted') ? 'uses' : undefined
 	})
 		.then(results => {

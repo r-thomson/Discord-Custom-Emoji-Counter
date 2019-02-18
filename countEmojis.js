@@ -37,6 +37,15 @@ module.exports = async function(client, guild, options) {
 					value += options.ignoreRepeats ? count > 0 : count;
 					emojiCounts.set(key, value);
 				});
+				
+				if (options.countReactions) {
+					message.reactions.forEach(reaction => {
+						let count = emojiCounts.get(reaction.emoji.id);
+						if (count !== undefined) {
+							emojiCounts.set(reaction.emoji.id, count + 1);
+						}
+					});
+				}
 			});
 			
 			if (messages.size < 100 || messagesRetreived >= messageLimit) {
