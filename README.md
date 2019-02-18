@@ -22,5 +22,6 @@ To invoke the bot on a server, just @mention the bot while it is running. Option
 
 * `norepeats` Only count one of each type of emoji per message
 * `sorted` Sort the output from most to least used
+* `reactions` Also count reactions to messages
 
 The bot can only scan for messages on channels that it has permission to read.
