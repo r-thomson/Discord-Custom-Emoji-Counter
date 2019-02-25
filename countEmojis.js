@@ -23,7 +23,9 @@ module.exports = async function(client, guild, options) {
 		return recursiveEmojiCount();
 		
 		async function recursiveEmojiCount(messagesBefore) {
-			let messages = await channel.fetchMessages({limit: 100, before: messagesBefore});
+			const MAX_FETCH = 100;
+			
+			let messages = await channel.fetchMessages({limit: MAX_FETCH, before: messagesBefore});
 			messagesRetreived += messages.size;
 			
 			messages.forEach(message => {
@@ -48,7 +50,7 @@ module.exports = async function(client, guild, options) {
 				}
 			});
 			
-			if (messages.size < 100 || messagesRetreived >= messageLimit) {
+			if (messages.size < MAX_FETCH || messagesRetreived >= messageLimit) {
 				console.log(`Finished scanning ${messagesRetreived} messages in "#${channel.name}".`);
 			} else {
 				const lastMessage = messages.array().pop();
