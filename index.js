@@ -29,11 +29,12 @@ client.on('message', message => {
 		return message.react('❤');
 	}
 	
-	const botMention = `<@${client.user.id}>`;
-	if (!message.content.startsWith(botMention)) return;
+	const botMentionRegex = new RegExp(`^<@!?${client.user.id}>`);
+	const mentionMatches = message.content.match(botMentionRegex);
+	if (mentionMatches === null) return;
 	
 	// Argument parsing
-	const args = message.content.slice(botMention.length).trim().toLowerCase().split(/ +/);
+	const args = message.content.slice(mentionMatches[0].length).trim().toLowerCase().split(/ +/);
 	
 	console.log(`Invoked by ${message.author} on server "${message.guild.name}"`);
 	
